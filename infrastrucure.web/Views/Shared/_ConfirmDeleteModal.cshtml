@@ -1,0 +1,26 @@
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="confirmDeleteModalLabel">Delete component</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1">Are you sure you want to permanently delete <span class="fw-semibold" data-component-name>this component</span>?</p>
+                <p class="text-secondary mb-0">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-controller="Components" asp-action="Delete" method="post" class="d-inline" id="confirmDeleteForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="confirmDeleteId" />
+                    <button type="submit" class="btn btn-danger d-inline-flex align-items-center" data-confirm-delete-submit>
+                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                        <i class="bi bi-trash me-2" aria-hidden="true"></i>
+                        <span>Delete</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

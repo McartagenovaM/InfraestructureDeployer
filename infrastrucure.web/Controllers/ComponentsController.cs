@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using infrastrucure.web.Models;
 using infrastrucure.web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +20,11 @@ public sealed class ComponentsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(string? environment, string? type, string? status)
+    public async Task<IActionResult> Index(string? environment, string? type, string? status, int page = 1, int pageSize = 10)
     {
+        var safePageSize = Math.Clamp(pageSize, 5, 50);
+        var safePage = page < 1 ? 1 : page;
+
         var viewModel = new ComponentsIndexViewModel
         {
             Environment = environment,
@@ -27,18 +32,38 @@ public sealed class ComponentsController : Controller
             Status = status,
             EnvironmentOptions = EnvironmentOptions,
             TypeOptions = TypeOptions,
-            StatusOptions = StatusOptions
+            StatusOptions = StatusOptions,
+            PageNumber = safePage,
+            PageSize = safePageSize
         };
 
         try
         {
             var components = await _apiClient.GetAllAsync(environment, type, status);
-            viewModel.Components = components;
+            var ordered = components
+                .OrderByDescending(component => component.CreatedUtc)
+                .ToList();
+
+            viewModel.TotalCount = ordered.Count;
+
+            var totalPages = viewModel.TotalPages;
+            if (totalPages == 0)
+            {
+                safePage = 1;
+                viewModel.PageNumber = safePage;
+            }
+            else if (safePage > totalPages)
+            {
+                safePage = totalPages;
+                viewModel.PageNumber = safePage;
+            }
+
+            var skip = (safePage - 1) * safePageSize;
+            viewModel.Components = ordered.Skip(skip).Take(safePageSize).ToList();
         }
         catch (HttpRequestException ex)
         {
-            TempData["ToastMessage"] = $"Unable to load components. {ex.Message}";
-            TempData["ToastType"] = "danger";
+            SetToast("Unable to load components.", "danger", ex.Message);
         }
 
         return View(viewModel);
@@ -138,7 +163,7 @@ public sealed class ComponentsController : Controller
         }
         catch (HttpRequestException ex)
         {
-            SetToast($"Failed to delete component. {ex.Message}", "danger");
+            SetToast("Failed to delete component.", "danger", ex.Message);
         }
 
         return RedirectToAction(nameof(Index));
@@ -171,7 +196,7 @@ public sealed class ComponentsController : Controller
         }
         catch (HttpRequestException ex)
         {
-            SetToast($"Action failed. {ex.Message}", "danger");
+            SetToast("Action failed.", "danger", ex.Message);
         }
 
         return RedirectToAction(nameof(Index));
@@ -187,9 +212,38 @@ public sealed class ComponentsController : Controller
         }
     }
 
-    private void SetToast(string message, string type)
+    private void SetToast(string message, string type, string? detail = null)
     {
-        TempData["ToastMessage"] = message;
-        TempData["ToastType"] = type;
+        var normalized = type?.ToLowerInvariant() ?? string.Empty;
+
+        switch (normalized)
+        {
+            case "success":
+                TempData.Remove("SuccessDetail");
+                TempData["Success"] = message;
+                if (!string.IsNullOrWhiteSpace(detail) && !string.Equals(detail, message, StringComparison.Ordinal))
+                {
+                    TempData["SuccessDetail"] = detail;
+                }
+                break;
+            case "warning":
+                TempData.Remove("ErrorDetail");
+                TempData["Error"] = message;
+                TempData["ErrorVariant"] = "warning";
+                if (!string.IsNullOrWhiteSpace(detail) && !string.Equals(detail, message, StringComparison.Ordinal))
+                {
+                    TempData["ErrorDetail"] = detail;
+                }
+                break;
+            default:
+                TempData.Remove("ErrorDetail");
+                TempData["Error"] = message;
+                TempData["ErrorVariant"] = "danger";
+                if (!string.IsNullOrWhiteSpace(detail) && !string.Equals(detail, message, StringComparison.Ordinal))
+                {
+                    TempData["ErrorDetail"] = detail;
+                }
+                break;
+        }
     }
 }

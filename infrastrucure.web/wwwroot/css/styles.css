@@ -1,16 +1,135 @@
-/* Zebra table rows */
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #f9fbfc;
+.btn-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  position: relative;
+  line-height: 1;
 }
 
-/* Toast positioning */
-#toast-container {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 1055;
+.btn-icon .bi {
+  font-size: 1rem;
 }
 
-.btn .spinner-border {
-  margin-right: 0.35rem;
+.btn-icon .spinner-border {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-width: 0.15em;
+  display: none;
+}
+
+.btn-icon.loading {
+  pointer-events: none;
+}
+
+.btn-icon.loading .bi {
+  opacity: 0;
+}
+
+.btn-icon.loading .spinner-border {
+  display: inline-block;
+  position: absolute;
+}
+
+.btn-icon:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
+}
+
+.btn-icon.btn-outline-success:focus-visible {
+  outline-color: var(--bs-success);
+}
+
+.btn-icon.btn-outline-warning:focus-visible {
+  outline-color: var(--bs-warning);
+}
+
+.btn-icon.btn-outline-danger:focus-visible {
+  outline-color: var(--bs-danger);
+}
+
+.btn-icon.btn-outline-secondary:focus-visible {
+  outline-color: var(--bs-secondary);
+}
+
+.btn-icon.btn-outline-primary:focus-visible {
+  outline-color: var(--bs-primary);
+}
+
+.status-badge {
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.status-badge.status-dev {
+  background-color: #e0f2ff;
+  color: #0a3b78;
+}
+
+.status-badge.status-qa {
+  background-color: #fff4d6;
+  color: #664d03;
+}
+
+.status-badge.status-prod {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-badge.status-provisioned {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-badge.status-deploying {
+  background-color: #fff4d6;
+  color: #664d03;
+}
+
+.status-badge.status-deleted {
+  background-color: #e2e3e5;
+  color: #41464b;
+}
+
+.status-badge.status-failed {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.table-responsive-sm {
+  overflow-x: auto;
+}
+
+@media (min-width: 576px) {
+  .table-responsive-sm {
+    overflow-x: visible;
+  }
+}
+
+.filters-row {
+  row-gap: 1rem;
+}
+
+.filters-row .form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.filters-row .form-select,
+.filters-row .form-control {
+  min-width: 0;
+}
+
+.toast-container {
+  z-index: 1080;
 }

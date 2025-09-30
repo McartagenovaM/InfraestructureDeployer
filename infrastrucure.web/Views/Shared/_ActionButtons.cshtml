@@ -1,0 +1,104 @@
+@model infrastrucure.web.Models.ComponentActionsVM
+@{
+    var statusValue = (Model.Status ?? string.Empty).Trim();
+    var statusKey = statusValue.ToUpperInvariant();
+    var isDeleted = statusKey == "DELETED";
+    var isDeploying = statusKey == "DEPLOYING";
+    var ariaLabel = string.IsNullOrWhiteSpace(Model.Name)
+        ? "Component actions"
+        : $"Actions for {Model.Name}";
+
+    bool ShouldDisable(bool condition, bool fallback = false) => condition || fallback;
+
+    var canProvision = !ShouldDisable(isDeleted || isDeploying, !Model.CanProvision);
+    var canDeploy = !ShouldDisable(isDeploying, !Model.CanDeploy);
+    var canTeardown = !ShouldDisable(isDeleted || isDeploying, !Model.CanTeardown);
+    var canDelete = !ShouldDisable(isDeploying, !Model.CanDelete);
+
+    var deployButtonClasses = $"btn btn-sm btn-outline-primary btn-icon{(isDeploying ? " loading" : string.Empty)}";
+}
+<div class="btn-group" role="group" aria-label="@ariaLabel" data-component-action-group>
+    <a class="btn btn-sm btn-outline-secondary btn-icon"
+       asp-controller="Components"
+       asp-action="Edit"
+       asp-route-id="@Model.Id"
+       aria-label="Edit component"
+       data-bs-toggle="tooltip"
+       data-bs-placement="top"
+       title="Edit">
+        <i class="bi bi-pencil" aria-hidden="true"></i>
+        <span class="visually-hidden">Edit</span>
+    </a>
+    <form asp-controller="Components"
+          asp-action="Provision"
+          asp-route-id="@Model.Id"
+          method="post"
+          class="d-inline">
+        @Html.AntiForgeryToken()
+        <button type="submit"
+                class="btn btn-sm btn-outline-success btn-icon"
+                data-action="provision"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Provision"
+                aria-label="Provision component"
+                @(canProvision ? null : "disabled")>
+            <i class="bi bi-lightning-charge" aria-hidden="true"></i>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="visually-hidden">Provision</span>
+        </button>
+    </form>
+    <form asp-controller="Components"
+          asp-action="Deploy"
+          asp-route-id="@Model.Id"
+          method="post"
+          class="d-inline">
+        @Html.AntiForgeryToken()
+        <button type="submit"
+                class="@deployButtonClasses"
+                data-action="deploy"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Deploy"
+                aria-label="Deploy component"
+                @(canDeploy ? null : "disabled")>
+            <i class="bi bi-rocket" aria-hidden="true"></i>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="visually-hidden">Deploy</span>
+        </button>
+    </form>
+    <form asp-controller="Components"
+          asp-action="Teardown"
+          asp-route-id="@Model.Id"
+          method="post"
+          class="d-inline">
+        @Html.AntiForgeryToken()
+        <button type="submit"
+                class="btn btn-sm btn-outline-warning btn-icon"
+                data-action="teardown"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Teardown"
+                aria-label="Teardown component"
+                @(canTeardown ? null : "disabled")>
+            <i class="bi bi-plug-fill" aria-hidden="true"></i>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="visually-hidden">Teardown</span>
+        </button>
+    </form>
+    <button type="button"
+            class="btn btn-sm btn-outline-danger btn-icon"
+            data-action="delete"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="Delete"
+            aria-label="Delete component"
+            data-bs-target="#confirmDeleteModal"
+            data-component-id="@Model.Id"
+            data-component-name="@Model.Name"
+            @(canDelete ? null : "disabled")>
+        <i class="bi bi-trash" aria-hidden="true"></i>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <span class="visually-hidden">Delete</span>
+    </button>
+</div>

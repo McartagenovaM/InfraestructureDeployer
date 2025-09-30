@@ -1,0 +1,15 @@
+@model string
+@{
+    var value = (Model ?? string.Empty).Trim();
+    var key = value.ToUpperInvariant();
+    var (label, bootstrapClass, modifierClass) = key switch
+    {
+        "PROVISIONED" => ("Provisioned", "bg-success", "status-provisioned"),
+        "DEPLOYING" => ("Deploying", "bg-warning text-dark", "status-deploying"),
+        "FAILED" => ("Failed", "bg-danger", "status-failed"),
+        "DELETED" => ("Deleted", "bg-secondary", "status-deleted"),
+        _ when string.IsNullOrWhiteSpace(value) => ("Unknown", "bg-secondary", string.Empty),
+        _ => (System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value.ToLowerInvariant()), "bg-primary", string.Empty)
+    };
+}
+<span class="badge status-badge @modifierClass @bootstrapClass" data-status="@key">@label</span>
