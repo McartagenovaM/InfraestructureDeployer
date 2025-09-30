@@ -1,3 +1,32 @@
+/* Navbar look & feel */
+.navbar {
+    --bs-navbar-padding-y: .5rem;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: .2px;
+}
+
+/* Bigger logo, scales up on large screens */
+.brand-logo {
+    height: auto;
+    width: auto;
+    display: block;
+}
+
+@media (min-width: 992px) {
+    .brand-logo {
+        height: 44px;
+    }
+}
+
+/* Keep brand text readable but not oversized */
+.brand-text {
+    font-size: 1.125rem;
+    line-height: 1;
+}
+
 .btn-icon {
   width: 2.25rem;
   height: 2.25rem;
