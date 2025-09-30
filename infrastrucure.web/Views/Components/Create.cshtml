@@ -1,0 +1,54 @@
+@model ComponentCreateDto
+@{
+    ViewData["Title"] = "New Component";
+    var environmentOptions = (string[])ViewData["EnvironmentOptions"]!;
+    var typeOptions = (string[])ViewData["TypeOptions"]!;
+}
+
+<h1 class="h3 mb-4">New Component</h1>
+
+<form asp-action="Create" method="post" class="card shadow-sm" data-loading-form="true">
+    @Html.AntiForgeryToken()
+    <div class="card-body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Type" class="form-label"></label>
+            <select asp-for="Type" class="form-select">
+                <option value="">Select a type</option>
+                @foreach (var option in typeOptions)
+                {
+                    <option value="@option">@option.ToUpperInvariant()</option>
+                }
+            </select>
+            <span asp-validation-for="Type" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Environment" class="form-label"></label>
+            <select asp-for="Environment" class="form-select">
+                <option value="">Select an environment</option>
+                @foreach (var option in environmentOptions)
+                {
+                    <option value="@option">@option.ToUpperInvariant()</option>
+                }
+            </select>
+            <span asp-validation-for="Environment" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-end gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" data-loading-button="true">
+            <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+            <span class="visually-hidden">Processing...</span>
+            <i class="fa-solid fa-floppy-disk me-2"></i>Save
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

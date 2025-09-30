@@ -1,0 +1,26 @@
+@model ComponentReadDto
+
+<div class="modal fade" id="deleteModal-@Model.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@Model.Id" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel-@Model.Id">Delete Component</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>@Model.Name</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post" data-loading-form="true">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger" data-loading-button="true">
+                        <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                        <span class="visually-hidden">Processing...</span>
+                        <i class="fa-solid fa-trash me-2"></i>Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
