@@ -1,0 +1,16 @@
+/* Zebra table rows */
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f9fbfc;
+}
+
+/* Toast positioning */
+#toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1055;
+}
+
+.btn .spinner-border {
+  margin-right: 0.35rem;
+}

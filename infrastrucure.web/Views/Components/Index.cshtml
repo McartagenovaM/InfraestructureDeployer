@@ -1,0 +1,127 @@
+@model ComponentsIndexViewModel
+@{
+    ViewData["Title"] = "Components";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h1 class="h3 mb-0">Components</h1>
+    <a class="btn btn-primary" asp-action="Create">
+        <i class="fa-solid fa-plus me-2"></i>New Component
+    </a>
+</div>
+
+<form method="get" class="row g-3 align-items-end mb-4">
+    <div class="col-12 col-md-4">
+        <label class="form-label" for="environmentFilter">Environment</label>
+        <select class="form-select" id="environmentFilter" name="environment">
+            <option value="">All</option>
+            @foreach (var option in Model.EnvironmentOptions)
+            {
+                <option value="@option" selected="@(string.Equals(Model.Environment, option, StringComparison.OrdinalIgnoreCase) ? "selected" : null)">@option.ToUpperInvariant()</option>
+            }
+        </select>
+    </div>
+    <div class="col-12 col-md-4">
+        <label class="form-label" for="typeFilter">Type</label>
+        <select class="form-select" id="typeFilter" name="type">
+            <option value="">All</option>
+            @foreach (var option in Model.TypeOptions)
+            {
+                <option value="@option" selected="@(string.Equals(Model.Type, option, StringComparison.OrdinalIgnoreCase) ? "selected" : null)">@option.ToUpperInvariant()</option>
+            }
+        </select>
+    </div>
+    <div class="col-12 col-md-4">
+        <label class="form-label" for="statusFilter">Status</label>
+        <select class="form-select" id="statusFilter" name="status">
+            <option value="">All</option>
+            @foreach (var option in Model.StatusOptions)
+            {
+                <option value="@option" selected="@(string.Equals(Model.Status, option, StringComparison.OrdinalIgnoreCase) ? "selected" : null)">@option.ToUpperInvariant()</option>
+            }
+        </select>
+    </div>
+    <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary">
+            <i class="fa-solid fa-filter me-2"></i>Apply Filters
+        </button>
+        <a class="btn btn-outline-secondary" asp-action="Index">
+            <i class="fa-solid fa-rotate-left me-2"></i>Reset
+        </a>
+    </div>
+</form>
+
+@if (Model.Components.Count == 0)
+{
+    <div class="alert alert-info" role="alert">
+        No components found. Create a new component to get started.
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Environment</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Created (UTC)</th>
+                            <th scope="col" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var component in Model.Components)
+                        {
+                            <tr>
+                                <td>@component.Name</td>
+                                <td class="text-uppercase">@component.Type</td>
+                                <td class="text-uppercase">@component.Environment</td>
+                                <td class="text-uppercase">@component.Status</td>
+                                <td>@component.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="text-end">
+                                    <div class="btn-group" role="group" aria-label="Component actions">
+                                        <a class="btn btn-outline-secondary btn-sm" asp-action="Edit" asp-route-id="@component.Id" title="Edit">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+                                        <form asp-action="Provision" asp-route-id="@component.Id" method="post" class="d-inline" data-loading-form="true">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-outline-success btn-sm" title="Provision" data-loading-button="true">
+                                                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Processing...</span>
+                                                <i class="fa-solid fa-play"></i>
+                                            </button>
+                                        </form>
+                                        <form asp-action="Deploy" asp-route-id="@component.Id" method="post" class="d-inline" data-loading-form="true">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-outline-primary btn-sm" title="Deploy" data-loading-button="true">
+                                                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Processing...</span>
+                                                <i class="fa-solid fa-upload"></i>
+                                            </button>
+                                        </form>
+                                        <form asp-action="Teardown" asp-route-id="@component.Id" method="post" class="d-inline" data-loading-form="true">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-outline-warning btn-sm" title="Teardown" data-loading-button="true">
+                                                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Processing...</span>
+                                                <i class="fa-solid fa-power-off"></i>
+                                            </button>
+                                        </form>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@component.Id" title="Delete">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @await Html.PartialAsync("_DeleteModal", component)
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
