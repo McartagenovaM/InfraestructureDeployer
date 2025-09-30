@@ -1,6 +1,65 @@
-@infrastructure.api_HostAddress = http://localhost:5155
+@host = https://localhost:7100
 
-GET {{infrastructure.api_HostAddress}}/weatherforecast/
+### Get all components
+GET {{host}}/api/components
 Accept: application/json
 
-###
+### Get components filtered by environment
+GET {{host}}/api/components?env=dev&page=1&pageSize=5
+Accept: application/json
+
+### Get component by id
+GET {{host}}/api/components/{{componentId}}
+Accept: application/json
+
+### Create component
+POST {{host}}/api/components
+Content-Type: application/json
+
+{
+  "name": "Build Agent",
+  "type": "vm",
+  "environment": "dev",
+  "metadata": {
+    "os": "linux"
+  }
+}
+
+### Update component
+PUT {{host}}/api/components/{{componentId}}
+Content-Type: application/json
+
+{
+  "name": "Build Agent",
+  "type": "vm",
+  "environment": "qa",
+  "status": "provisioned",
+  "metadata": {
+    "os": "linux",
+    "size": "standard-d2"
+  }
+}
+
+### Patch status
+PATCH {{host}}/api/components/{{componentId}}/status
+Content-Type: application/json
+
+{
+  "status": "failed"
+}
+
+### Provision component
+POST {{host}}/api/components/{{componentId}}/provision
+Accept: application/json
+
+### Deploy component
+POST {{host}}/api/components/{{componentId}}/deploy
+Accept: application/json
+
+### Teardown component
+POST {{host}}/api/components/{{componentId}}/teardown
+Accept: application/json
+
+### Delete component
+DELETE {{host}}/api/components/{{componentId}}
+Accept: application/json
