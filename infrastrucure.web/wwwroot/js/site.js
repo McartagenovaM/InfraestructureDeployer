@@ -70,7 +70,7 @@
         const nameTarget = modalEl.querySelector('[data-component-name]');
         const submitButton = modalEl.querySelector('[data-confirm-delete-submit]');
         const spinner = submitButton ? submitButton.querySelector('.spinner-border') : null;
-        const icon = submitButton ? submitButton.querySelector('.bi') : null;
+        const icon = submitButton ? submitButton.querySelector('[data-icon]') : null;
 
         const resetButtonState = () => {
             if (submitButton) {
