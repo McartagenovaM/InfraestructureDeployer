@@ -2,13 +2,13 @@
 @{
     var value = (Model ?? string.Empty).Trim();
     var key = value.ToUpperInvariant();
-    var (label, bootstrapClass, modifierClass) = key switch
+    var (label, modifierClass) = key switch
     {
-        "DEV" => ("DEV", "bg-info text-dark", "status-dev"),
-        "QA" => ("QA", "bg-primary text-white", "status-qa"),
-        "PROD" => ("PROD", "bg-success", "status-prod"),
-        _ when string.IsNullOrWhiteSpace(value) => ("UNKNOWN", "bg-secondary", string.Empty),
-        _ => (key, "bg-secondary", string.Empty)
+        "DEV" => ("DEV", "badge-env-dev"),
+        "QA" => ("QA", "badge-env-qa"),
+        "PROD" => ("PROD", "badge-env-prod"),
+        _ when string.IsNullOrWhiteSpace(value) => ("UNKNOWN", "badge-env-unknown"),
+        _ => (key, "badge-env-unknown")
     };
 }
-<span class="badge status-badge @modifierClass @bootstrapClass" data-environment="@key">@label</span>
+<span class="badge @modifierClass" data-environment="@key">@label</span>

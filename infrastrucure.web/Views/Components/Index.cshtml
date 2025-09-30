@@ -6,8 +6,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <h1 class="h3 mb-0">Components</h1>
-    <a class="btn btn-primary" asp-action="Create">
-        <i class="bi bi-plus-lg me-2" aria-hidden="true"></i>New Component
+    <a class="btn btn-accent d-inline-flex align-items-center" asp-action="Create">
+        <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>
+        <span>New Component</span>
     </a>
 </div>
 
@@ -42,28 +43,33 @@
             }
         </select>
     </div>
-    <div class="col-12 col-sm-6 col-lg-3 d-flex gap-2">
-        <button type="submit" class="btn btn-outline-primary flex-grow-1 flex-sm-grow-0">
-            <i class="bi bi-funnel me-2" aria-hidden="true"></i>Apply Filters
-        </button>
-        <a class="btn btn-outline-secondary" asp-action="Index" asp-route-pageSize="@Model.PageSize">
-            <i class="bi bi-arrow-counterclockwise me-2" aria-hidden="true"></i>Reset
-        </a>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="d-flex flex-wrap">
+            <button type="submit" class="btn btn-accent flex-grow-1 flex-sm-grow-0" aria-label="Apply filters">
+                <i class="fa-solid fa-filter me-2" aria-hidden="true"></i>
+                <span>Filter</span>
+            </button>
+            <a class="btn btn-outline-primary flex-grow-1 flex-sm-grow-0" asp-action="Index" asp-route-pageSize="@Model.PageSize" aria-label="Reset filters">
+                <i class="fa-solid fa-rotate-left me-2" aria-hidden="true"></i>
+                <span>Reset</span>
+            </a>
+        </div>
     </div>
 </form>
 
 @if (!Model.HasResults)
 {
     <div class="card border-0 shadow-sm">
-        <div class="card-body py-5 text-center">
-            <div class="mb-3">
-                <i class="bi bi-hdd-network fs-1 text-primary" aria-hidden="true"></i>
+        <div class="card-body">
+            <div class="text-center py-5">
+                <i class="fa-solid fa-cubes fa-2xl mb-3" aria-hidden="true"></i>
+                <h5>No components found</h5>
+                <p class="text-muted">Try adjusting filters or create a new component.</p>
+                <a class="btn btn-accent" asp-action="Create">
+                    <i class="fa-solid fa-plus me-2" aria-hidden="true"></i>
+                    <span>New Component</span>
+                </a>
             </div>
-            <h2 class="h4 mb-2">No components found</h2>
-            <p class="text-secondary mb-4">Try adjusting filters or create a new component.</p>
-            <a class="btn btn-primary" asp-action="Create">
-                <i class="bi bi-plus-lg me-2" aria-hidden="true"></i>New Component
-            </a>
         </div>
     </div>
 }
