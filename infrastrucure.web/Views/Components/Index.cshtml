@@ -1,3 +1,4 @@
+@using infrastrucure.web.Models
 @model ComponentsIndexViewModel
 @{
     ViewData["Title"] = "Components";
@@ -6,12 +7,12 @@
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <h1 class="h3 mb-0">Components</h1>
     <a class="btn btn-primary" asp-action="Create">
-        <i class="fa-solid fa-plus me-2"></i>New Component
+        <i class="bi bi-plus-lg me-2" aria-hidden="true"></i>New Component
     </a>
 </div>
 
-<form method="get" class="row g-3 align-items-end mb-4">
-    <div class="col-12 col-md-4">
+<form method="get" class="row g-3 filters-row align-items-end mb-4">
+    <div class="col-12 col-sm-6 col-lg-3">
         <label class="form-label" for="environmentFilter">Environment</label>
         <select class="form-select" id="environmentFilter" name="environment">
             <option value="">All</option>
@@ -21,7 +22,7 @@
             }
         </select>
     </div>
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-sm-6 col-lg-3">
         <label class="form-label" for="typeFilter">Type</label>
         <select class="form-select" id="typeFilter" name="type">
             <option value="">All</option>
@@ -31,7 +32,7 @@
             }
         </select>
     </div>
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-sm-6 col-lg-3">
         <label class="form-label" for="statusFilter">Status</label>
         <select class="form-select" id="statusFilter" name="status">
             <option value="">All</option>
@@ -41,28 +42,37 @@
             }
         </select>
     </div>
-    <div class="col-12 d-flex gap-2">
-        <button type="submit" class="btn btn-outline-primary">
-            <i class="fa-solid fa-filter me-2"></i>Apply Filters
+    <div class="col-12 col-sm-6 col-lg-3 d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary flex-grow-1 flex-sm-grow-0">
+            <i class="bi bi-funnel me-2" aria-hidden="true"></i>Apply Filters
         </button>
-        <a class="btn btn-outline-secondary" asp-action="Index">
-            <i class="fa-solid fa-rotate-left me-2"></i>Reset
+        <a class="btn btn-outline-secondary" asp-action="Index" asp-route-pageSize="@Model.PageSize">
+            <i class="bi bi-arrow-counterclockwise me-2" aria-hidden="true"></i>Reset
         </a>
     </div>
 </form>
 
-@if (Model.Components.Count == 0)
+@if (!Model.HasResults)
 {
-    <div class="alert alert-info" role="alert">
-        No components found. Create a new component to get started.
+    <div class="card border-0 shadow-sm">
+        <div class="card-body py-5 text-center">
+            <div class="mb-3">
+                <i class="bi bi-hdd-network fs-1 text-primary" aria-hidden="true"></i>
+            </div>
+            <h2 class="h4 mb-2">No components found</h2>
+            <p class="text-secondary mb-4">Try adjusting filters or create a new component.</p>
+            <a class="btn btn-primary" asp-action="Create">
+                <i class="bi bi-plus-lg me-2" aria-hidden="true"></i>New Component
+            </a>
+        </div>
     </div>
 }
 else
 {
     <div class="card shadow-sm">
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-striped mb-0 align-middle">
+            <div class="table-responsive-sm">
+                <table class="table table-striped table-hover mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
                             <th scope="col">Name</th>
@@ -79,49 +89,71 @@ else
                             <tr>
                                 <td>@component.Name</td>
                                 <td class="text-uppercase">@component.Type</td>
-                                <td class="text-uppercase">@component.Environment</td>
-                                <td class="text-uppercase">@component.Status</td>
+                                <td>
+                                    @await Html.PartialAsync("_EnvBadge", component.Environment)
+                                </td>
+                                <td>
+                                    @await Html.PartialAsync("_StatusBadge", component.Status)
+                                </td>
                                 <td>@component.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
                                 <td class="text-end">
-                                    <div class="btn-group" role="group" aria-label="Component actions">
-                                        <a class="btn btn-outline-secondary btn-sm" asp-action="Edit" asp-route-id="@component.Id" title="Edit">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </a>
-                                        <form asp-action="Provision" asp-route-id="@component.Id" method="post" class="d-inline" data-loading-form="true">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-outline-success btn-sm" title="Provision" data-loading-button="true">
-                                                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                                                <span class="visually-hidden">Processing...</span>
-                                                <i class="fa-solid fa-play"></i>
-                                            </button>
-                                        </form>
-                                        <form asp-action="Deploy" asp-route-id="@component.Id" method="post" class="d-inline" data-loading-form="true">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-outline-primary btn-sm" title="Deploy" data-loading-button="true">
-                                                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                                                <span class="visually-hidden">Processing...</span>
-                                                <i class="fa-solid fa-upload"></i>
-                                            </button>
-                                        </form>
-                                        <form asp-action="Teardown" asp-route-id="@component.Id" method="post" class="d-inline" data-loading-form="true">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-outline-warning btn-sm" title="Teardown" data-loading-button="true">
-                                                <span class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
-                                                <span class="visually-hidden">Processing...</span>
-                                                <i class="fa-solid fa-power-off"></i>
-                                            </button>
-                                        </form>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@component.Id" title="Delete">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
+                                    @await Html.PartialAsync("_ActionButtons", new ComponentActionsVM
+                                    {
+                                        Id = component.Id,
+                                        Name = component.Name,
+                                        Status = component.Status,
+                                        CanProvision = !string.Equals(component.Status, "DELETED", System.StringComparison.OrdinalIgnoreCase)
+                                                       && !string.Equals(component.Status, "DEPLOYING", System.StringComparison.OrdinalIgnoreCase),
+                                        CanDeploy = string.Equals(component.Status, "PROVISIONED", System.StringComparison.OrdinalIgnoreCase),
+                                        CanTeardown = string.Equals(component.Status, "PROVISIONED", System.StringComparison.OrdinalIgnoreCase),
+                                        CanDelete = true
+                                    })
                                 </td>
                             </tr>
-                            @await Html.PartialAsync("_DeleteModal", component)
                         }
                     </tbody>
                 </table>
             </div>
         </div>
+        @if (Model.TotalPages > 1)
+        {
+            <div class="card-footer bg-white py-3">
+                <nav aria-label="Components pagination">
+                    <ul class="pagination justify-content-end mb-0">
+                        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : string.Empty)">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.PageNumber - 1)"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-environment="@Model.Environment"
+                               asp-route-type="@Model.Type"
+                               asp-route-status="@Model.Status"
+                               aria-label="Previous page">Previous</a>
+                        </li>
+                        @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                        {
+                            <li class="page-item @(Model.PageNumber == pageNumber ? "active" : string.Empty)">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@pageNumber"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-environment="@Model.Environment"
+                                   asp-route-type="@Model.Type"
+                                   asp-route-status="@Model.Status">@pageNumber</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : string.Empty)">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.PageNumber + 1)"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-environment="@Model.Environment"
+                               asp-route-type="@Model.Type"
+                               asp-route-status="@Model.Status"
+                               aria-label="Next page">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
     </div>
 }
+
+@await Html.PartialAsync("_ConfirmDeleteModal")

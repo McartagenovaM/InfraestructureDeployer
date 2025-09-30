@@ -1,0 +1,14 @@
+@model string
+@{
+    var value = (Model ?? string.Empty).Trim();
+    var key = value.ToUpperInvariant();
+    var (label, bootstrapClass, modifierClass) = key switch
+    {
+        "DEV" => ("DEV", "bg-info text-dark", "status-dev"),
+        "QA" => ("QA", "bg-primary text-white", "status-qa"),
+        "PROD" => ("PROD", "bg-success", "status-prod"),
+        _ when string.IsNullOrWhiteSpace(value) => ("UNKNOWN", "bg-secondary", string.Empty),
+        _ => (key, "bg-secondary", string.Empty)
+    };
+}
+<span class="badge status-badge @modifierClass @bootstrapClass" data-environment="@key">@label</span>

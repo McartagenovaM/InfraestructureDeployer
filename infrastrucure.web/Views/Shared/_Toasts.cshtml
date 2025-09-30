@@ -1,32 +1,58 @@
+@using System.Collections.Generic
+
 @{
-    var message = TempData["ToastMessage"] as string;
-    var type = TempData["ToastType"] as string ?? "info";
-    var toastClasses = type switch
+    var toasts = new List<(string Variant, string Title, string Message, string? Detail)>();
+    if (TempData.ContainsKey("Success"))
     {
-        "success" => "text-bg-success",
-        "warning" => "text-bg-warning",
-        "danger" => "text-bg-danger",
-        _ => "text-bg-info"
-    };
+        var message = TempData["Success"] as string;
+        var detail = TempData["SuccessDetail"] as string;
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            toasts.Add(("success", "Success", message!, string.IsNullOrWhiteSpace(detail) ? null : detail));
+        }
+    }
+
+    if (TempData.ContainsKey("Error"))
+    {
+        var message = TempData["Error"] as string;
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            var variant = TempData["ErrorVariant"] as string ?? "danger";
+            var title = string.Equals(variant, "warning", System.StringComparison.OrdinalIgnoreCase) ? "Attention" : "Error";
+            var detail = TempData["ErrorDetail"] as string;
+            toasts.Add((variant, title, message!, string.IsNullOrWhiteSpace(detail) ? null : detail));
+        }
+    }
 }
 
-@if (!string.IsNullOrEmpty(message))
+@if (toasts.Count > 0)
 {
-    <div id="toast-container" class="toast-container position-fixed">
-        <div class="toast align-items-center @toastClasses show" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    @message
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toast-container" aria-live="polite" aria-atomic="true">
+        @foreach (var toast in toasts)
+        {
+            var role = string.Equals(toast.Variant, "danger", System.StringComparison.OrdinalIgnoreCase) ? "alert" : "status";
+            var icon = toast.Variant switch
+            {
+                "success" => "check-circle-fill",
+                "warning" => "exclamation-triangle-fill",
+                _ => "exclamation-octagon-fill"
+            };
+            <div class="toast align-items-center text-bg-@toast.Variant shadow-sm mb-2" role="@role" data-bs-autohide="true" data-bs-delay="6000">
+                <div class="d-flex">
+                    <div class="toast-body d-flex">
+                        <i class="bi bi-@icon me-3 fs-4" aria-hidden="true"></i>
+                        <div>
+                            <div class="fw-semibold">@toast.Title</div>
+                            <div>@toast.Message</div>
+                            @if (!string.IsNullOrWhiteSpace(toast.Detail))
+                            {
+                                <div class="small opacity-75">@toast.Detail</div>
+                            }
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-        </div>
-    </div>
-    <script>
-        const toastEl = document.querySelector('#toast-container .toast');
-        if (toastEl) {
-            const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
-            toast.show();
         }
-    </script>
+    </div>
 }
