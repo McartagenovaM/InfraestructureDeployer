@@ -1,4 +1,5 @@
 using infrastructure.api.Data;
+using infrastructure.api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc; // for ProblemDetails
 using System.Text.Json;
@@ -14,7 +15,7 @@ builder.Services
     .AddJsonOptions(o =>
     {
         o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        // If you later add enums, consider: o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        // o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
 // ProblemDetails middleware
@@ -34,6 +35,39 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// ===== Dynamic seed for demo data =====
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    if (!db.Components.Any())
+    {
+        db.Components.AddRange(
+            new InfrastructureComponent
+            {
+                Id = Guid.NewGuid(),
+                Name = "Demo VM",
+                Type = "vm",
+                Environment = "dev",
+                Status = "provisioned",
+                CreatedUtc = DateTime.UtcNow
+            },
+            new InfrastructureComponent
+            {
+                Id = Guid.NewGuid(),
+                Name = "Demo SQL Database",
+                Type = "sql",
+                Environment = "prod",
+                Status = "provisioned",
+                CreatedUtc = DateTime.UtcNow
+            }
+        );
+
+        db.SaveChanges();
+    }
+}
+// =====================================
 
 // HSTS in non-dev
 if (!app.Environment.IsDevelopment())
